@@ -1,8 +1,8 @@
 [package]
-name = "bevy_game" # ToDo
+name = "queen_beevy"
 version = "0.1.0"
 publish = false
-authors = ["Niklas Eicker <git@nikl.me>"] # ToDo: you are the author ;)
+authors = ["Matthew Martelle <matthew@martelle.dev>"]
 edition = "2021"
 exclude = ["dist", "build", "assets", "credits"]
 
@@ -62,6 +62,7 @@ webbrowser = { version = "0.8", features = ["hardened"] }
 # keep the following in sync with Bevy's dependencies
 winit = { version = "0.28.7", default-features = false }
 image = { version = "0.24", default-features = false }
+bevy_xpbd_2d = "0.3.2"
 
 [build-dependencies]
 embed-resource = "1.4"
