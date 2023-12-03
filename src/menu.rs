@@ -1,6 +1,12 @@
 use crate::loading::TextureAssets;
 use crate::GameState;
-use bevy::prelude::*;
+use bevy::{
+    core_pipeline::{
+        bloom::{BloomCompositeMode, BloomSettings},
+        tonemapping::Tonemapping,
+    },
+    prelude::*,
+};
 
 pub struct MenuPlugin;
 
@@ -34,7 +40,17 @@ struct Menu;
 
 fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
     info!("menu");
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((
+        Camera2dBundle {
+            camera: Camera {
+                hdr: true, // 1. HDR is required for bloom
+                ..default()
+            },
+            tonemapping: Tonemapping::TonyMcMapface, // 2. Using a tonemapper that desaturates to white is recommended
+            ..default()
+        },
+        BloomSettings::default(), // 3. Enable bloom for the camera
+    ));
     commands
         .spawn((
             NodeBundle {

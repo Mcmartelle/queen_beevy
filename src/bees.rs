@@ -12,7 +12,7 @@ pub struct BeesPlugin;
 impl Plugin for BeesPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(BeesHelperPlugin)
-            .insert_resource(ClearColor(Color::rgb(0.46, 0.71, 0.996)))
+            .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
             .insert_resource(SubstepCount(6))
             .insert_resource(Gravity(Vector::NEG_Y * 100.0))
             .add_systems(OnEnter(GameState::Playing), setup)
@@ -49,10 +49,17 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
         ..default()
     };
 
+    let p1_color = Color::rgb(7.0, 3.0, 3.0); // The Red Team vs
+    let p2_color = Color::rgb(2.0, 3.0, 7.0); // The Blue Team
+
     commands.spawn((
         SpriteBundle {
             texture: textures.queen.clone(),
             transform: Transform::from_translation(Vec3::new(-350., 0., 1.)),
+            sprite: Sprite {
+                color: p1_color,
+                ..default()
+            },
             ..Default::default()
         },
         RigidBody::Dynamic,
@@ -66,6 +73,7 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
             texture: textures.queen.clone(),
             transform: Transform::from_translation(Vec3::new(350., 0., 1.)),
             sprite: Sprite {
+                color: p2_color,
                 flip_x: true,
                 flip_y: false,
                 ..default()
@@ -136,6 +144,10 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
                         y as f32 * 5.0 * bee_radius - 100.0,
                         0.0,
                     ),
+                    sprite: Sprite {
+                        color: p1_color,
+                        ..default()
+                    },
                     ..default()
                 },
                 RigidBody::Dynamic,
@@ -156,6 +168,10 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
                         y as f32 * 5.0 * bee_radius -100.0,
                         0.0,
                     ),
+                    sprite: Sprite {
+                        color: p2_color,
+                        ..default()
+                    },
                     ..default()
                 },
                 RigidBody::Dynamic,
