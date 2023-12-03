@@ -43,7 +43,7 @@ impl Plugin for GamePlugin {
             MenuPlugin,
             ActionsPlugin,
             InternalAudioPlugin,
-            PlayerPlugin,
+            // PlayerPlugin,
             BeesPlugin,
         ));
 

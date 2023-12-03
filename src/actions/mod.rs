@@ -1,7 +1,7 @@
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 
-use crate::actions::game_control::{get_movement, GameControl};
+use crate::actions::game_control::{P1Control, P2Control, get_p1_movement, get_p2_movement};
 use crate::player::Player;
 use crate::GameState;
 
@@ -24,37 +24,51 @@ impl Plugin for ActionsPlugin {
 
 #[derive(Default, Resource)]
 pub struct Actions {
-    pub player_movement: Option<Vec2>,
+    pub p1_movement: Option<Vec2>,
+    pub p2_movement: Option<Vec2>,
 }
 
 pub fn set_movement_actions(
     mut actions: ResMut<Actions>,
     keyboard_input: Res<Input<KeyCode>>,
-    touch_input: Res<Touches>,
-    player: Query<&Transform, With<Player>>,
-    camera: Query<(&Camera, &GlobalTransform), With<Camera2d>>,
+    // touch_input: Res<Touches>,
+    // player: Query<&Transform, With<Player>>,
+    // camera: Query<(&Camera, &GlobalTransform), With<Camera2d>>,
 ) {
-    let mut player_movement = Vec2::new(
-        get_movement(GameControl::Right, &keyboard_input)
-            - get_movement(GameControl::Left, &keyboard_input),
-        get_movement(GameControl::Up, &keyboard_input)
-            - get_movement(GameControl::Down, &keyboard_input),
+    let p1_movement = Vec2::new(
+        get_p1_movement(P1Control::Right, &keyboard_input)
+            - get_p1_movement(P1Control::Left, &keyboard_input),
+        get_p1_movement(P1Control::Up, &keyboard_input)
+            - get_p1_movement(P1Control::Down, &keyboard_input),
     );
 
-    if let Some(touch_position) = touch_input.first_pressed_position() {
-        let (camera, camera_transform) = camera.single();
-        if let Some(touch_position) = camera.viewport_to_world_2d(camera_transform, touch_position)
-        {
-            let diff = touch_position - player.single().translation.xy();
-            if diff.length() > FOLLOW_EPSILON {
-                player_movement = diff.normalize();
-            }
-        }
+    let p2_movement = Vec2::new(
+        get_p2_movement(P2Control::Right, &keyboard_input)
+            - get_p2_movement(P2Control::Left, &keyboard_input),
+        get_p2_movement(P2Control::Up, &keyboard_input)
+            - get_p2_movement(P2Control::Down, &keyboard_input),
+    );
+
+    // if let Some(touch_position) = touch_input.first_pressed_position() {
+    //     let (camera, camera_transform) = camera.single();
+    //     if let Some(touch_position) = camera.viewport_to_world_2d(camera_transform, touch_position)
+    //     {
+    //         let diff = touch_position - player.single().translation.xy();
+    //         if diff.length() > FOLLOW_EPSILON {
+    //             player_movement = diff.normalize();
+    //         }
+    //     }
+    // }
+
+    if p1_movement != Vec2::ZERO {
+        actions.p1_movement = Some(p1_movement.normalize());
+    } else {
+        actions.p1_movement = None;
     }
 
-    if player_movement != Vec2::ZERO {
-        actions.player_movement = Some(player_movement.normalize());
+    if p2_movement != Vec2::ZERO {
+        actions.p2_movement = Some(p2_movement.normalize());
     } else {
-        actions.player_movement = None;
+        actions.p2_movement = None;
     }
 }

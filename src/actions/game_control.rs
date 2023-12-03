@@ -1,32 +1,66 @@
 use bevy::prelude::{Input, KeyCode, Res};
 
-pub enum GameControl {
+pub enum P1Control {
     Up,
     Down,
     Left,
     Right,
 }
 
-impl GameControl {
+pub enum P2Control {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+impl P1Control {
     pub fn pressed(&self, keyboard_input: &Res<Input<KeyCode>>) -> bool {
         match self {
-            GameControl::Up => {
-                keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up)
+            P1Control::Up => {
+                keyboard_input.pressed(KeyCode::W)
             }
-            GameControl::Down => {
-                keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down)
+            P1Control::Down => {
+                keyboard_input.pressed(KeyCode::S)
             }
-            GameControl::Left => {
-                keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left)
+            P1Control::Left => {
+                keyboard_input.pressed(KeyCode::A)
             }
-            GameControl::Right => {
-                keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right)
+            P1Control::Right => {
+                keyboard_input.pressed(KeyCode::D)
             }
         }
     }
 }
 
-pub fn get_movement(control: GameControl, input: &Res<Input<KeyCode>>) -> f32 {
+impl P2Control {
+    pub fn pressed(&self, keyboard_input: &Res<Input<KeyCode>>) -> bool {
+        match self {
+            P2Control::Up => {
+                keyboard_input.pressed(KeyCode::Up)
+            }
+            P2Control::Down => {
+                keyboard_input.pressed(KeyCode::Down)
+            }
+            P2Control::Left => {
+                keyboard_input.pressed(KeyCode::Left)
+            }
+            P2Control::Right => {
+                keyboard_input.pressed(KeyCode::Right)
+            }
+        }
+    }
+}
+
+pub fn get_p1_movement(control: P1Control, input: &Res<Input<KeyCode>>) -> f32 {
+    if control.pressed(input) {
+        1.0
+    } else {
+        0.0
+    }
+}
+
+pub fn get_p2_movement(control: P2Control, input: &Res<Input<KeyCode>>) -> f32 {
     if control.pressed(input) {
         1.0
     } else {

@@ -32,13 +32,13 @@ fn move_player(
     actions: Res<Actions>,
     mut player_query: Query<&mut Transform, With<Player>>,
 ) {
-    if actions.player_movement.is_none() {
+    if actions.p1_movement.is_none() {
         return;
     }
     let speed = 150.;
     let movement = Vec3::new(
-        actions.player_movement.unwrap().x * speed * time.delta_seconds(),
-        actions.player_movement.unwrap().y * speed * time.delta_seconds(),
+        actions.p1_movement.unwrap_or(Vec2::new(0.0,0.0)).x * speed * time.delta_seconds(),
+        actions.p1_movement.unwrap_or(Vec2::new(0.0,0.0)).y * speed * time.delta_seconds(),
         0.,
     );
     for mut player_transform in &mut player_query {
