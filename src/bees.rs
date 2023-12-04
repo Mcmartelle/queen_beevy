@@ -288,8 +288,8 @@ fn p1_bee_movement(
     let delta_time = time.delta_seconds_f64().adjust_precision();
 
     for mut linear_velocity in &mut bees {
-        linear_velocity.x += actions.p1_movement.unwrap_or(Vec2::new(0.0,0.0)).x * 500.0 * delta_time;
-        linear_velocity.y += actions.p1_movement.unwrap_or(Vec2::new(0.0,0.0)).y * 500.0 * delta_time;
+        linear_velocity.x += actions.p1_bee_movement.unwrap_or(Vec2::new(0.0,0.0)).x * 500.0 * delta_time;
+        linear_velocity.y += actions.p1_bee_movement.unwrap_or(Vec2::new(0.0,0.0)).y * 500.0 * delta_time;
     }
 }
 

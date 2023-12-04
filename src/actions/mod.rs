@@ -146,13 +146,13 @@ fn gamepad_events(
         }
     }
 
-    if let Some(p1_movement) = actions.p1_movement {
-        actions.p1_movement = Some(p1_movement.normalize()); // Assuming double normalizing won't hurt keyboard input
-    }
+    // if let Some(p1_movement) = actions.p1_movement {
+    //     actions.p1_movement = Some(p1_movement.normalize()); // Assuming double normalizing won't hurt keyboard input
+    // }
 
-    if let Some(p1_bee_movement) = actions.p1_bee_movement {
-        actions.p1_bee_movement = Some(p1_bee_movement.normalize()); // Assuming double normalizing won't hurt keyboard input
-    }
+    // if let Some(p1_bee_movement) = actions.p1_bee_movement {
+    //     actions.p1_bee_movement = Some(p1_bee_movement.normalize()); // Assuming double normalizing won't hurt keyboard input
+    // }
 
 
     for button_changed_event in button_changed_events.read() {
