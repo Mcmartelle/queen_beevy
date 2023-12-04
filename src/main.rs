@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
+use bevy::window::{PrimaryWindow, WindowMode, WindowResolution};
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
 use queen_beevy::GamePlugin;
@@ -22,6 +22,9 @@ fn main() {
                 fit_canvas_to_parent: true,
                 // Tells wasm not to override default event handling, like F5 and Ctrl+R
                 prevent_default_event_handling: false,
+                mode: WindowMode::BorderlessFullscreen,
+                resolution: WindowResolution::new(640., 360.)
+                            .with_scale_factor_override(3.0),
                 ..default()
             }),
             ..default()

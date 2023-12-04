@@ -218,24 +218,24 @@ pub fn death_collisions(
             actions.p1_queen_died = true;
             queen_just_died = true;
             println!("Player 2 Wins!!!");
-            time.pause();
+            // time.pause();
         } else if let Ok(_) = p1_queen_query.get(*entity2) {
             actions.p1_queen_died = true;
             queen_just_died = true;
             println!("Player 2 Wins!!!");
-            time.pause();
+            // time.pause();
         }
         
         if let Ok(_) = p2_queen_query.get(*entity1) {
             actions.p2_queen_died = true;
             queen_just_died = true;
             println!("Player 1 Wins!!!");
-            time.pause();
+            // time.pause();
         } else if let Ok(_) = p2_queen_query.get(*entity2) {
             actions.p2_queen_died = true;
             queen_just_died = true;
             println!("Player 1 Wins!!!");
-            time.pause();
+            // time.pause();
         }
 
         if !queen_just_died {
