@@ -159,10 +159,14 @@ pub fn gamepad_input (
 
     if let (Some(x), Some(y)) = (axes.get(axis_lx), axes.get(axis_ly)) {
         // combine X and Y into one vector
+        info!("p1_queen x: {}", x);
+        info!("p1_queen y: {}", y);
         actions.p1_movement = Vec2::new(x, y);
     }
     if let (Some(x), Some(y)) = (axes.get(axis_rx), axes.get(axis_ry)) {
         // combine X and Y into one vector
+        info!("p1_bees x: {}", x);
+        info!("p1_bees y: {}", y);
         actions.p1_bee_movement = Vec2::new(x, y);
     }
 }
