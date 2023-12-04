@@ -41,6 +41,7 @@ pub fn gamepad_system(
     button_inputs: Res<Input<GamepadButton>>,
     button_axes: Res<Axis<GamepadButton>>,
     axes: Res<Axis<GamepadAxis>>,
+    mut actions: ResMut<Actions>,
 ) {
     for gamepad in gamepads.iter() {
         if button_inputs.just_pressed(GamepadButton::new(gamepad, GamepadButtonType::South)) {
@@ -67,10 +68,27 @@ pub fn gamepad_system(
             info!("{:?} LeftStickX value is {}", gamepad, left_stick_x);
         }
         let left_stick_y = axes
-            .get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickY))
-            .unwrap();
+        .get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickY))
+        .unwrap();
         if left_stick_y.abs() > 0.01 {
             info!("{:?} LeftStickX value is {}", gamepad, left_stick_y);
         }
+
+        let right_stick_x = axes
+            .get(GamepadAxis::new(gamepad, GamepadAxisType::RightStickX))
+            .unwrap();
+        if right_stick_x.abs() > 0.01 {
+            info!("{:?} RightStickX value is {}", gamepad, right_stick_x);
+        }
+        let right_stick_y = axes
+        .get(GamepadAxis::new(gamepad, GamepadAxisType::RightStickY))
+        .unwrap();
+        if right_stick_y.abs() > 0.01 {
+            info!("{:?} RightStickX value is {}", gamepad, right_stick_y);
+        }
+        actions.p1_movement.x = left_stick_x;
+        actions.p1_movement.y = left_stick_y;
+        actions.p1_bee_movement.x = right_stick_x;
+        actions.p1_bee_movement.y = right_stick_y;
     }
 }
