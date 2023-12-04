@@ -2,7 +2,7 @@ use crate::loading::TextureAssets;
 use crate::GameState;
 use bevy::{
     core_pipeline::{
-        bloom::{BloomCompositeMode, BloomSettings},
+        bloom::BloomSettings,
         tonemapping::Tonemapping,
     },
     prelude::*,
