@@ -1,4 +1,5 @@
 use crate::actions::{set_movement_actions, Actions};
+use crate::bees::death_collisions;
 use crate::loading::AudioAssets;
 use crate::GameState;
 use bevy::prelude::*;
@@ -13,15 +14,23 @@ impl Plugin for InternalAudioPlugin {
             .add_systems(OnEnter(GameState::Playing), start_audio)
             .add_systems(
                 Update,
-                control_flying_sound
-                    .after(set_movement_actions)
-                    .run_if(in_state(GameState::Playing)),
-            );
+                // (
+                    // control_flying_sound
+                //     .after(set_movement_actions)
+                //     .run_if(in_state(GameState::Playing)),
+                play_death_sound
+                    .after(death_collisions)
+                    .run_if(in_state(GameState::Playing)
+                // ),
+            ));
     }
 }
 
 #[derive(Resource)]
 struct FlyingAudio(Handle<AudioInstance>);
+
+#[derive(Resource)]
+struct DeathAudio(Handle<AudioInstance>);
 
 fn start_audio(mut commands: Commands, audio_assets: Res<AudioAssets>, audio: Res<Audio>) {
     audio.pause();
@@ -31,6 +40,17 @@ fn start_audio(mut commands: Commands, audio_assets: Res<AudioAssets>, audio: Re
         .with_volume(0.3)
         .handle();
     commands.insert_resource(FlyingAudio(handle));
+}
+
+fn play_death_sound(
+    actions: Res<Actions>,
+    audio_assets: Res<AudioAssets>,
+    audio: Res<Audio>,
+) {
+    if actions.worker_bee_died {
+        audio.play(audio_assets.death.clone())
+            .with_volume(0.3);
+    }
 }
 
 fn control_flying_sound(

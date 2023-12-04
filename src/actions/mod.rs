@@ -1,8 +1,8 @@
-use bevy::math::Vec3Swizzles;
+// use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 
 use crate::actions::game_control::{P1Control, P2Control, get_p1_movement, get_p2_movement};
-use crate::player::Player;
+// use crate::player::Player;
 use crate::GameState;
 
 mod game_control;
@@ -26,6 +26,9 @@ impl Plugin for ActionsPlugin {
 pub struct Actions {
     pub p1_movement: Option<Vec2>,
     pub p2_movement: Option<Vec2>,
+    pub p1_queen_died: bool,
+    pub p2_queen_died: bool,
+    pub worker_bee_died: bool,
 }
 
 pub fn set_movement_actions(

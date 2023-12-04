@@ -21,7 +21,8 @@ impl Plugin for BeesPlugin {
                 p2_queen_movement.run_if(in_state(GameState::Playing)),
                 p1_bee_movement.run_if(in_state(GameState::Playing)),
                 p2_bee_movement.run_if(in_state(GameState::Playing))
-            ));
+            ))
+            .add_systems(PostProcessCollisions, (apply_deferred.run_if(in_state(GameState::Playing)),death_collisions.run_if(in_state(GameState::Playing))).chain());
     }
 }
 
@@ -40,6 +41,9 @@ struct P1Bee;
 #[derive(Component)]
 struct P2Bee;
 
+#[derive(Component)]
+struct Wall;
+
 fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
     // commands.spawn(Camera2dBundle::default());
 
@@ -51,6 +55,13 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
 
     let p1_color = Color::rgb(7.0, 3.0, 3.0); // The Red Team vs
     let p2_color = Color::rgb(2.0, 3.0, 7.0); // The Blue Team
+
+    // Define the collision layers
+    #[derive(PhysicsLayer)]
+    enum Layer {
+        Blue,
+        Red,
+    }
 
     commands.spawn((
         SpriteBundle {
@@ -64,6 +75,7 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
         },
         RigidBody::Dynamic,
         Collider::ball(30.0 as Scalar),
+        CollisionLayers::new([Layer::Red], [Layer::Blue]),
         Player,
         Player1,
     ));
@@ -82,6 +94,7 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
         },
         RigidBody::Dynamic,
         Collider::ball(30.0 as Scalar),
+        CollisionLayers::new([Layer::Blue], [Layer::Red]),
         Player,
         Player2,
     ));
@@ -131,8 +144,8 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
         Collider::cuboid(50.0, 50.0),
     ));
 
-    let bee_radius = 5.0;
-
+    let bee_radius = 7.0;
+    let bee_spacing = 25.0;
     // Spawn stacks of Player 1 Bees
     for x in 0..10 {
         for y in 0..10 {
@@ -140,8 +153,8 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
                 SpriteBundle {
                     texture: textures.bee.clone(),
                     transform: Transform::from_xyz(
-                        x as f32 * -5.0 * bee_radius - 50.0,
-                        y as f32 * 5.0 * bee_radius - 100.0,
+                        x as f32 * -1.0 * bee_spacing - 50.0,
+                        y as f32 * 1.0 * bee_spacing - 100.0,
                         0.0,
                     ),
                     sprite: Sprite {
@@ -152,6 +165,7 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
                 },
                 RigidBody::Dynamic,
                 Collider::ball(bee_radius as Scalar),
+                CollisionLayers::new([Layer::Red], [Layer::Blue]),
                 P1Bee,
             ));
         }
@@ -164,8 +178,8 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
                 SpriteBundle {
                     texture: textures.bee.clone(),
                     transform: Transform::from_xyz(
-                        x as f32 * 5.0 * bee_radius + 50.0,
-                        y as f32 * 5.0 * bee_radius -100.0,
+                        x as f32 * bee_spacing + 50.0,
+                        y as f32 * bee_spacing - 100.0,
                         0.0,
                     ),
                     sprite: Sprite {
@@ -176,9 +190,61 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
                 },
                 RigidBody::Dynamic,
                 Collider::ball(bee_radius as Scalar),
+                CollisionLayers::new([Layer::Blue], [Layer::Red]),
                 P2Bee,
             ));
         }
+    }
+}
+
+pub fn death_collisions(
+    // mut commands: Commands,
+    mut actions: ResMut<Actions>,
+    mut collision_event_reader: EventReader<CollisionStarted>,
+    p1_queen_query: Query<Entity, With<Player1>>,
+    p2_queen_query: Query<Entity, With<Player2>>,
+    mut time: ResMut<Time<Physics>>,
+) {
+    
+    // actions.p1_queen_died = false; // maybe set this to false on game/round restart
+    // actions.p2_queen_died = false; // maybe set this to false on game/round restart
+    actions.worker_bee_died = false;
+
+    for CollisionStarted(entity1, entity2) in collision_event_reader.read() {
+
+        let mut queen_just_died: bool = false;
+        
+        if let Ok(_) = p1_queen_query.get(*entity1) {
+            actions.p1_queen_died = true;
+            queen_just_died = true;
+            println!("Player 2 Wins!!!");
+            time.pause();
+        } else if let Ok(_) = p1_queen_query.get(*entity2) {
+            actions.p1_queen_died = true;
+            queen_just_died = true;
+            println!("Player 2 Wins!!!");
+            time.pause();
+        }
+        
+        if let Ok(_) = p2_queen_query.get(*entity1) {
+            actions.p2_queen_died = true;
+            queen_just_died = true;
+            println!("Player 1 Wins!!!");
+            time.pause();
+        } else if let Ok(_) = p2_queen_query.get(*entity2) {
+            actions.p2_queen_died = true;
+            queen_just_died = true;
+            println!("Player 1 Wins!!!");
+            time.pause();
+        }
+
+        if !queen_just_died {
+            // worker bees dying
+            // commands.entity(*entity1).despawn();
+            // commands.entity(*entity2).despawn();
+            actions.worker_bee_died = true;
+        }
+
     }
 }
 
