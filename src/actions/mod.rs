@@ -3,7 +3,7 @@ mod game_control;
 use bevy::{
     input::gamepad::{
         GamepadAxisChangedEvent, GamepadButtonChangedEvent, GamepadButtonInput,
-        GamepadConnectionEvent, GamepadEvent, GamepadConnection
+        GamepadConnectionEvent, GamepadConnection, Gamepad
     },
     prelude::*,
 };
@@ -21,16 +21,16 @@ impl Plugin for ActionsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Actions>().add_systems(
             Update,
-            gamepad_events.run_if(in_state(GameState::Playing)),
+            gamepad_input.run_if(in_state(GameState::Playing)),
         );
     }
 }
 
 #[derive(Default, Resource)]
 pub struct Actions {
-    pub p1_movement: Option<Vec2>,
-    pub p1_bee_movement: Option<Vec2>,
-    pub p2_movement: Option<Vec2>,
+    pub p1_movement: Vec2,
+    pub p1_bee_movement: Vec2,
+    pub p2_movement: Vec2,
     pub p1_queen_died: bool,
     pub p2_queen_died: bool,
     pub worker_bee_died: bool,
@@ -89,7 +89,6 @@ pub fn gamepad_events(
                 }
             }
             // other events are irrelevant
-            _ => {}
         }
     }
     for axis_changed_event in axis_changed_events.read() {
@@ -101,59 +100,29 @@ pub fn gamepad_events(
         //     if *p1_gamepad_id == axis_changed_event.gamepad {
                 match axis_changed_event.axis_type {
                     GamepadAxisType::LeftStickX => {
-                        match actions.p1_movement {
-                            Some(mut vec_2) => vec_2.x = axis_changed_event.value,
-                            None => {
-                                actions.p1_movement = Some(Vec2::new(axis_changed_event.value, 0.0))
-                            },
-                        }
+                        actions.p1_movement.x = axis_changed_event.value;
                     },
                     GamepadAxisType::LeftStickY => {
-                        match actions.p1_movement {
-                            Some(mut vec_2) => vec_2.y = axis_changed_event.value,
-                            None => {
-                                actions.p1_movement = Some(Vec2::new(0.0, axis_changed_event.value))
-                            },
-                        }
+                        actions.p1_movement.y = axis_changed_event.value;
                     },
                     GamepadAxisType::LeftZ => {
 
                     },
                     GamepadAxisType::RightStickX => {
-                        match actions.p1_bee_movement {
-                            Some(mut vec_2) => vec_2.x = axis_changed_event.value,
-                            None => {
-                                actions.p1_bee_movement = Some(Vec2::new(axis_changed_event.value, 0.0))
-                            },
-                        }
+                        actions.p1_bee_movement.x = axis_changed_event.value;
                     },
                     GamepadAxisType::RightStickY => {
-                        match actions.p1_bee_movement {
-                            Some(mut vec_2) => vec_2.y = axis_changed_event.value,
-                            None => {
-                                actions.p1_bee_movement = Some(Vec2::new(0.0, axis_changed_event.value))
-                            },
-                        }
+                        actions.p1_movement.y = axis_changed_event.value;
                     },
                     GamepadAxisType::RightZ => {
 
                     },
                     GamepadAxisType::Other(u8) => {
-
                     },
                 }
         //     }
         // }
     }
-
-    // if let Some(p1_movement) = actions.p1_movement {
-    //     actions.p1_movement = Some(p1_movement.normalize()); // Assuming double normalizing won't hurt keyboard input
-    // }
-
-    // if let Some(p1_bee_movement) = actions.p1_bee_movement {
-    //     actions.p1_bee_movement = Some(p1_bee_movement.normalize()); // Assuming double normalizing won't hurt keyboard input
-    // }
-
 
     for button_changed_event in button_changed_events.read() {
         info!(
@@ -165,6 +134,36 @@ pub fn gamepad_events(
     }
     for button_input_event in button_input_events.read() {
         info!("{:?}", button_input_event);
+    }
+}
+
+
+pub fn gamepad_input (
+    axes: Res<Axis<GamepadAxis>>,
+    mut actions: ResMut<Actions>,
+) {
+    let gamepad = Gamepad::new(0);
+    // The joysticks are represented using a separate axis for X and Y
+    let axis_lx = GamepadAxis {
+        gamepad, axis_type: GamepadAxisType::LeftStickX
+    };
+    let axis_ly = GamepadAxis {
+        gamepad, axis_type: GamepadAxisType::LeftStickY
+    };
+    let axis_rx = GamepadAxis {
+        gamepad, axis_type: GamepadAxisType::RightStickX
+    };
+    let axis_ry = GamepadAxis {
+        gamepad, axis_type: GamepadAxisType::RightStickY
+    };
+
+    if let (Some(x), Some(y)) = (axes.get(axis_lx), axes.get(axis_ly)) {
+        // combine X and Y into one vector
+        actions.p1_movement = Vec2::new(x, y);
+    }
+    if let (Some(x), Some(y)) = (axes.get(axis_rx), axes.get(axis_ry)) {
+        // combine X and Y into one vector
+        actions.p1_bee_movement = Vec2::new(x, y);
     }
 }
 
@@ -202,14 +201,14 @@ pub fn set_movement_actions(
     // }
 
     if p1_movement != Vec2::ZERO {
-        actions.p1_movement = Some(p1_movement.normalize());
+        actions.p1_movement = p1_movement.normalize();
     } else {
-        actions.p1_movement = None;
+        actions.p1_movement = Vec2::ZERO;
     }
 
     if p2_movement != Vec2::ZERO {
-        actions.p2_movement = Some(p2_movement.normalize());
+        actions.p2_movement = p2_movement.normalize();
     } else {
-        actions.p2_movement = None;
+        actions.p2_movement = Vec2::ZERO;
     }
 }

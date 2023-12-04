@@ -3,7 +3,7 @@
 use crate::bees_helper::BeesHelperPlugin;
 use crate::loading::TextureAssets;
 use crate::GameState;
-use crate::actions::{Actions, gamepad_events};
+use crate::actions::{Actions, gamepad_input};
 use bevy::prelude::*;
 use bevy_xpbd_2d::{math::*, prelude::*};
 
@@ -14,13 +14,13 @@ impl Plugin for BeesPlugin {
         app.add_plugins(BeesHelperPlugin)
             .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
             .insert_resource(SubstepCount(6))
-            .insert_resource(Gravity(Vector::NEG_Y * 100.0))
+            .insert_resource(Gravity(Vector::ZERO))
             .add_systems(OnEnter(GameState::Playing), setup)
             .add_systems(Update, (
-                p1_queen_movement.after(gamepad_events).run_if(in_state(GameState::Playing)),
-                p2_queen_movement.after(gamepad_events).run_if(in_state(GameState::Playing)),
-                p1_bee_movement.after(gamepad_events).run_if(in_state(GameState::Playing)),
-                p2_bee_movement.after(gamepad_events).run_if(in_state(GameState::Playing))
+                p1_queen_movement.after(gamepad_input).run_if(in_state(GameState::Playing)),
+                p2_queen_movement.after(gamepad_input).run_if(in_state(GameState::Playing)),
+                p1_bee_movement.after(gamepad_input).run_if(in_state(GameState::Playing)),
+                p2_bee_movement.after(gamepad_input).run_if(in_state(GameState::Playing))
             ))
             .add_systems(PostProcessCollisions, (apply_deferred.run_if(in_state(GameState::Playing)),death_collisions.run_if(in_state(GameState::Playing))).chain());
     }
@@ -203,7 +203,7 @@ pub fn death_collisions(
     mut collision_event_reader: EventReader<CollisionStarted>,
     p1_queen_query: Query<Entity, With<Player1>>,
     p2_queen_query: Query<Entity, With<Player2>>,
-    mut time: ResMut<Time<Physics>>,
+    // mut time: ResMut<Time<Physics>>,
 ) {
     
     // actions.p1_queen_died = false; // maybe set this to false on game/round restart
@@ -248,6 +248,11 @@ pub fn death_collisions(
     }
 }
 
+const QUEEN_MOVEMENT_SCALING_X: f32 = 700.0;
+const QUEEN_MOVEMENT_SCALING_Y: f32 = 700.0;
+const BEE_MOVEMENT_SCALING_X: f32 = 1000.0;
+const BEE_MOVEMENT_SCALING_Y: f32 = 1000.0;
+
 fn p1_queen_movement(
     time: Res<Time>,
     actions: Res<Actions>,
@@ -258,8 +263,8 @@ fn p1_queen_movement(
     let delta_time = time.delta_seconds_f64().adjust_precision();
 
     for mut linear_velocity in &mut bees {
-        linear_velocity.x += actions.p1_movement.unwrap_or(Vec2::new(0.0,0.0)).x * 200.0 * delta_time;
-        linear_velocity.y += actions.p1_movement.unwrap_or(Vec2::new(0.0,0.0)).y * 450.0 * delta_time;
+        linear_velocity.x += actions.p1_movement.x * QUEEN_MOVEMENT_SCALING_X * delta_time;
+        linear_velocity.y += actions.p1_movement.y * QUEEN_MOVEMENT_SCALING_Y * delta_time;
     }
 }
 
@@ -273,8 +278,8 @@ fn p2_queen_movement(
     let delta_time = time.delta_seconds_f64().adjust_precision();
 
     for mut linear_velocity in &mut bees {
-        linear_velocity.x += actions.p2_movement.unwrap_or(Vec2::new(0.0,0.0)).x * 200.0 * delta_time;
-        linear_velocity.y += actions.p2_movement.unwrap_or(Vec2::new(0.0,0.0)).y * 450.0 * delta_time;
+        linear_velocity.x += actions.p2_movement.x * QUEEN_MOVEMENT_SCALING_X * delta_time;
+        linear_velocity.y += actions.p2_movement.y * QUEEN_MOVEMENT_SCALING_Y * delta_time;
     }
 }
 
@@ -288,8 +293,8 @@ fn p1_bee_movement(
     let delta_time = time.delta_seconds_f64().adjust_precision();
 
     for mut linear_velocity in &mut bees {
-        linear_velocity.x += actions.p1_bee_movement.unwrap_or(Vec2::new(0.0,0.0)).x * 500.0 * delta_time;
-        linear_velocity.y += actions.p1_bee_movement.unwrap_or(Vec2::new(0.0,0.0)).y * 500.0 * delta_time;
+        linear_velocity.x += actions.p1_bee_movement.x * BEE_MOVEMENT_SCALING_X * delta_time;
+        linear_velocity.y += actions.p1_bee_movement.y * BEE_MOVEMENT_SCALING_Y * delta_time;
     }
 }
 
@@ -303,7 +308,7 @@ fn p2_bee_movement(
     let delta_time = time.delta_seconds_f64().adjust_precision();
 
     for mut linear_velocity in &mut bees {
-        linear_velocity.x += actions.p2_movement.unwrap_or(Vec2::new(0.0,0.0)).x * 500.0 * delta_time;
-        linear_velocity.y += actions.p2_movement.unwrap_or(Vec2::new(0.0,0.0)).y * 500.0 * delta_time;
+        linear_velocity.x += actions.p2_movement.x * BEE_MOVEMENT_SCALING_X * delta_time;
+        linear_velocity.y += actions.p2_movement.y * BEE_MOVEMENT_SCALING_Y * delta_time;
     }
 }

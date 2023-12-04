@@ -1,4 +1,6 @@
-use crate::actions::{set_movement_actions, Actions};
+use crate::actions::{
+    // set_movement_actions,
+    Actions};
 use crate::bees::death_collisions;
 use crate::loading::AudioAssets;
 use crate::GameState;
@@ -53,24 +55,24 @@ fn play_death_sound(
     }
 }
 
-fn control_flying_sound(
-    actions: Res<Actions>,
-    audio: Res<FlyingAudio>,
-    mut audio_instances: ResMut<Assets<AudioInstance>>,
-) {
-    if let Some(instance) = audio_instances.get_mut(&audio.0) {
-        match instance.state() {
-            PlaybackState::Paused { .. } => {
-                if actions.p1_movement.is_some() {
-                    instance.resume(AudioTween::default());
-                }
-            }
-            PlaybackState::Playing { .. } => {
-                if actions.p1_movement.is_none() {
-                    instance.pause(AudioTween::default());
-                }
-            }
-            _ => {}
-        }
-    }
-}
+// fn control_flying_sound(
+//     actions: Res<Actions>,
+//     audio: Res<FlyingAudio>,
+//     mut audio_instances: ResMut<Assets<AudioInstance>>,
+// ) {
+//     if let Some(instance) = audio_instances.get_mut(&audio.0) {
+//         match instance.state() {
+//             PlaybackState::Paused { .. } => {
+//                 if actions.p1_movement != Vec2::ZERO {
+//                     instance.resume(AudioTween::default());
+//                 }
+//             }
+//             PlaybackState::Playing { .. } => {
+//                 if actions.p1_movement == Vec2::ZERO {
+//                     instance.pause(AudioTween::default());
+//                 }
+//             }
+//             _ => {}
+//         }
+//     }
+// }
