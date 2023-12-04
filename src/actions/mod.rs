@@ -37,12 +37,12 @@ pub struct Actions {
 }
 
 #[derive(Resource)]
-struct P1Gamepad(Gamepad);
+pub struct P1Gamepad(Gamepad);
 
 #[derive(Resource)]
-struct P2Gamepad(Gamepad);
+pub struct P2Gamepad(Gamepad);
 
-fn gamepad_events(
+pub fn gamepad_events(
     mut connection_events: EventReader<GamepadConnectionEvent>,
     mut axis_changed_events: EventReader<GamepadAxisChangedEvent>,
     // Handles the continuous measure of how far a button has been pressed down, as measured
