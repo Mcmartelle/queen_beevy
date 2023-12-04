@@ -97,8 +97,8 @@ fn gamepad_events(
             "{:?} of {:?} is changed to {}",
             axis_changed_event.axis_type, axis_changed_event.gamepad, axis_changed_event.value
         );
-        if let Some(P1Gamepad(p1_gamepad_id)) = p1_gamepad.as_deref() {
-            if *p1_gamepad_id == axis_changed_event.gamepad {
+        // if let Some(P1Gamepad(p1_gamepad_id)) = p1_gamepad.as_deref() {
+        //     if *p1_gamepad_id == axis_changed_event.gamepad {
                 match axis_changed_event.axis_type {
                     GamepadAxisType::LeftStickX => {
                         match actions.p1_movement {
@@ -142,8 +142,8 @@ fn gamepad_events(
 
                     },
                 }
-            }
-        }
+        //     }
+        // }
     }
 
     // if let Some(p1_movement) = actions.p1_movement {
