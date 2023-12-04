@@ -3,7 +3,7 @@
 use crate::bees_helper::BeesHelperPlugin;
 use crate::loading::TextureAssets;
 use crate::GameState;
-use crate::actions::Actions;
+use crate::actions::{Actions, gamepad_events};
 use bevy::prelude::*;
 use bevy_xpbd_2d::{math::*, prelude::*};
 
@@ -17,10 +17,10 @@ impl Plugin for BeesPlugin {
             .insert_resource(Gravity(Vector::NEG_Y * 100.0))
             .add_systems(OnEnter(GameState::Playing), setup)
             .add_systems(Update, (
-                p1_queen_movement.run_if(in_state(GameState::Playing)),
-                p2_queen_movement.run_if(in_state(GameState::Playing)),
-                p1_bee_movement.run_if(in_state(GameState::Playing)),
-                p2_bee_movement.run_if(in_state(GameState::Playing))
+                p1_queen_movement.after(gamepad_events).run_if(in_state(GameState::Playing)),
+                p2_queen_movement.after(gamepad_events).run_if(in_state(GameState::Playing)),
+                p1_bee_movement.after(gamepad_events).run_if(in_state(GameState::Playing)),
+                p2_bee_movement.after(gamepad_events).run_if(in_state(GameState::Playing))
             ))
             .add_systems(PostProcessCollisions, (apply_deferred.run_if(in_state(GameState::Playing)),death_collisions.run_if(in_state(GameState::Playing))).chain());
     }
