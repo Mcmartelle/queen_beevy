@@ -1,6 +1,6 @@
 #![allow(clippy::unnecessary_cast)]
 
-use crate::bees_helper::BeesHelperPlugin;
+use crate::bee_spawner::BeeSpawnerPlugin;
 use crate::loading::TextureAssets;
 use crate::GameState;
 use crate::actions::{Actions, gamepad_system};
@@ -11,8 +11,9 @@ pub struct BeesPlugin;
 
 impl Plugin for BeesPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(BeesHelperPlugin)
+        app.add_plugins(BeeSpawnerPlugin)
             .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+            .insert_resource(TeamColors{ p1_color: Color::rgb(7.0, 3.0, 3.0), p2_color: Color::rgb(2.0, 3.0, 7.0)})
             .insert_resource(SubstepCount(6))
             .insert_resource(Gravity(Vector::ZERO))
             .add_systems(OnEnter(GameState::Playing), setup)
@@ -35,16 +36,32 @@ pub struct Player1;
 #[derive(Component)]
 pub struct Player2;
 
-#[derive(Component)]
-struct P1Bee;
 
 #[derive(Component)]
-struct P2Bee;
+pub struct Production(pub f32);
 
 #[derive(Component)]
-struct Wall;
+pub struct P1Bee;
 
-fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
+#[derive(Component)]
+pub struct P2Bee;
+
+#[derive(Component)]
+pub struct Wall;
+
+#[derive(Default, Resource)]
+pub struct TeamColors {
+    pub p1_color: Color,
+    pub p2_color: Color,
+}
+// Define the collision layers
+#[derive(PhysicsLayer)]
+pub enum Layer {
+    Blue,
+    Red,
+}
+
+fn setup(mut commands: Commands, textures: Res<TextureAssets>, team_colors: Res<TeamColors>) {
     // commands.spawn(Camera2dBundle::default());
 
     let square_sprite = Sprite {
@@ -53,22 +70,13 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
         ..default()
     };
 
-    let p1_color = Color::rgb(7.0, 3.0, 3.0); // The Red Team vs
-    let p2_color = Color::rgb(2.0, 3.0, 7.0); // The Blue Team
-
-    // Define the collision layers
-    #[derive(PhysicsLayer)]
-    enum Layer {
-        Blue,
-        Red,
-    }
 
     commands.spawn((
         SpriteBundle {
             texture: textures.queen.clone(),
             transform: Transform::from_translation(Vec3::new(-350., 0., 1.)),
             sprite: Sprite {
-                color: p1_color,
+                color: team_colors.p1_color,
                 ..default()
             },
             ..Default::default()
@@ -76,6 +84,7 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
         RigidBody::Dynamic,
         Collider::ball(30.0 as Scalar),
         CollisionLayers::new([Layer::Red], [Layer::Blue]),
+        Production(1.0),
         Player,
         Player1,
     ));
@@ -85,7 +94,7 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
             texture: textures.queen.clone(),
             transform: Transform::from_translation(Vec3::new(350., 0., 1.)),
             sprite: Sprite {
-                color: p2_color,
+                color: team_colors.p2_color,
                 flip_x: true,
                 flip_y: false,
                 ..default()
@@ -158,7 +167,7 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
                         0.0,
                     ),
                     sprite: Sprite {
-                        color: p1_color,
+                        color: team_colors.p1_color,
                         ..default()
                     },
                     ..default()
@@ -183,7 +192,7 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
                         0.0,
                     ),
                     sprite: Sprite {
-                        color: p2_color,
+                        color: team_colors.p2_color,
                         ..default()
                     },
                     ..default()

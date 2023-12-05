@@ -1,5 +1,3 @@
-mod game_control;
-
 use bevy::{
     input::gamepad::{
         GamepadButton,

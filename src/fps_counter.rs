@@ -6,9 +6,9 @@ use bevy_xpbd_2d::prelude::*;
 use crate::GameState;
 
 #[derive(Default)]
-pub struct BeesHelperPlugin;
+pub struct FPSCounterPlugin;
 
-impl Plugin for BeesHelperPlugin {
+impl Plugin for FPSCounterPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(PhysicsPlugins::default())
             .add_systems(OnEnter(GameState::Playing), setup)
