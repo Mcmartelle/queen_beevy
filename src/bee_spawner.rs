@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::GameState;
-use crate::bees::{Production, Player, TeamColors, Layer, P1Bee};
+use crate::bees::{Production, QueenBee, WorkerBee};
 use crate::loading::TextureAssets;
 use bevy_xpbd_2d::{math::*, prelude::*};
 
@@ -17,9 +17,8 @@ fn spawn_worker_bee(
     mut commands: Commands,
     mut time_produced: Local<f32>,
     time: Res<Time>,
-    queen_query: Query<(&Transform, &Production), With<Player>>,
+    queen_query: Query<(&Transform, &Production), With<QueenBee>>,
     textures: Res<TextureAssets>,
-    team_colors: Res<TeamColors>
 ) {
 
     for (transform, production) in &queen_query {
@@ -29,16 +28,11 @@ fn spawn_worker_bee(
                 SpriteBundle {
                     texture: textures.bee.clone(),
                     transform: transform.clone(),
-                    sprite: Sprite {
-                        color: team_colors.p1_color,
-                        ..default()
-                    },
                     ..default()
                 },
                 RigidBody::Dynamic,
                 Collider::ball(7.0 as Scalar),
-                CollisionLayers::new([Layer::Red], [Layer::Blue]),
-                P1Bee,
+                WorkerBee,
             ));
         }
     } 
