@@ -147,15 +147,16 @@ const BEE_MOVEMENT_SCALING_Y: f32 = 1000.0;
 fn queen_bee_movement(
     time: Res<Time>,
     actions: Res<Actions>,
-    mut bees: Query<&mut LinearVelocity, With<QueenBee>>,
+    mut bees: Query<(&mut LinearVelocity, &mut Sprite), With<QueenBee>>,
 ) {
     // Precision is adjusted so that the example works with
     // both the `f32` and `f64` features. Otherwise you don't need this.
     let delta_time = time.delta_seconds_f64().adjust_precision();
 
-    for mut linear_velocity in &mut bees {
+    for (mut linear_velocity, mut sprite) in &mut bees {
         linear_velocity.x += actions.p1_movement.x * QUEEN_MOVEMENT_SCALING_X * delta_time;
         linear_velocity.y += actions.p1_movement.y * QUEEN_MOVEMENT_SCALING_Y * delta_time;
+        sprite.flip_x = actions.p1_movement.x < 0.0;
     }
 }
 
