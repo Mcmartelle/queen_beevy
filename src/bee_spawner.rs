@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::bees::{Production, QueenBee, WorkerBee};
 use crate::loading::TextureAssets;
+use crate::scoreboard::Score;
 use crate::GameState;
 use bevy_xpbd_2d::{math::*, prelude::*};
 
@@ -25,6 +26,7 @@ fn spawn_worker_bee(
     time: Res<Time>,
     queen_query: Query<(&Transform, &Production), With<QueenBee>>,
     textures: Res<TextureAssets>,
+    mut score: ResMut<Score>,
 ) {
     for (transform, production) in &queen_query {
         if (time.elapsed_seconds() - *time_produced) > (1.0 / production.0) {
@@ -39,6 +41,7 @@ fn spawn_worker_bee(
                 Collider::ball(7.0 as Scalar),
                 WorkerBee,
             ));
+            score.bees += 1;
         }
     }
 }
