@@ -17,7 +17,8 @@ impl Plugin for InternalAudioPlugin {
         app: &mut App,
     ) {
         app.add_plugins(AudioPlugin)
-            .add_systems(OnEnter(GameState::Playing), start_audio)
+            .add_audio_channel::<Background>()
+            .add_systems(OnEnter(GameState::Playing), play_background_music)
             .add_systems(
                 Update,
                 play_flower_sound
@@ -28,56 +29,28 @@ impl Plugin for InternalAudioPlugin {
 }
 
 #[derive(Resource)]
-struct FlyingAudio(Handle<AudioInstance>);
+struct Background;
 
 #[derive(Resource)]
 struct FlowerAudio(Handle<AudioInstance>);
 
-fn start_audio(
-    mut commands: Commands,
+fn play_background_music(
+    background_channel: Res<AudioChannel<Background>>,
     audio_assets: Res<AudioAssets>,
-    audio: Res<Audio>,
 ) {
-    audio.pause();
-    let handle = audio
-        .play(audio_assets.flower.clone())
-        .with_volume(0.5)
-        .handle();
-    audio.stop();
-    commands.insert_resource(FlowerAudio(handle));
+    background_channel
+        .play(audio_assets.background_music.clone())
+        .looped()
+        .with_volume(0.3);
 }
 
 fn play_flower_sound(
-    mut commands: Commands,
     mut actions: ResMut<Actions>,
-    flower_audio: Res<FlowerAudio>,
     audio: Res<Audio>,
     audio_assets: Res<AudioAssets>,
-    mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
-    if let Some(instance) = audio_instances.get_mut(&flower_audio.0) {
-        match instance.state() {
-            PlaybackState::Paused { .. } => {
-                instance.resume(AudioTween::default());
-            }
-            PlaybackState::Playing { .. } | PlaybackState::Stopping { .. } => {
-                if actions.flower_gotten {
-                    actions.flower_gotten = false;
-                    instance.seek_to(0.0);
-                    // instance.pause(AudioTween::default());
-                }
-            }
-            PlaybackState::Stopped => {
-                if actions.flower_gotten {
-                    actions.flower_gotten = false;
-                    let handle = audio
-                        .play(audio_assets.flower.clone())
-                        .with_volume(0.5)
-                        .handle();
-                    commands.insert_resource(FlowerAudio(handle));
-                }
-            }
-            _ => {}
-        }
+    if actions.flower_gotten {
+        actions.flower_gotten = false;
+        audio.play(audio_assets.flower.clone()).with_volume(0.5);
     }
 }

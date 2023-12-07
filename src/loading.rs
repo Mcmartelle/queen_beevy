@@ -26,8 +26,8 @@ impl Plugin for LoadingPlugin {
 
 #[derive(AssetCollection, Resource)]
 pub struct AudioAssets {
-    #[asset(path = "audio/flying.ogg")]
-    pub flying: Handle<AudioSource>,
+    #[asset(path = "audio/Rimsky-Korsakov_-_flight_of_the_bumblebee.oga")]
+    pub background_music: Handle<AudioSource>,
     #[asset(path = "audio/flower-get.ogg")]
     pub flower: Handle<AudioSource>,
 }
