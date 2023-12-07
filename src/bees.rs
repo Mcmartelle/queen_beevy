@@ -4,6 +4,7 @@ use crate::bee_spawner::BeeSpawnerPlugin;
 use crate::loading::TextureAssets;
 use crate::GameState;
 use crate::actions::{Actions, gamepad_system};
+use crate::scoreboard::Score;
 use bevy::prelude::*;
 use bevy_xpbd_2d::{math::*, prelude::*};
 
@@ -12,15 +13,16 @@ pub struct BeesPlugin;
 impl Plugin for BeesPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(BeeSpawnerPlugin)
-            .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+            .add_plugins(PhysicsPlugins::default())
+            .insert_resource(ClearColor(Color::rgb(0.161, 0.678, 1.0)))
             .insert_resource(SubstepCount(6))
             .insert_resource(Gravity(Vector::ZERO))
             .add_systems(OnEnter(GameState::Playing), setup)
             .add_systems(Update, (
                 queen_bee_movement.after(gamepad_system).run_if(in_state(GameState::Playing)),
                 worker_bee_movement.after(gamepad_system).run_if(in_state(GameState::Playing)),
-            ));
-            // .add_systems(PostProcessCollisions, (apply_deferred.run_if(in_state(GameState::Playing)),death_collisions.run_if(in_state(GameState::Playing))).chain());
+            ))
+            .add_systems(PostProcessCollisions, flower_collision.run_if(in_state(GameState::Playing)));
     }
 }
 
@@ -36,6 +38,9 @@ pub struct WorkerBee;
 #[derive(Component)]
 pub struct Wall;
 
+#[derive(Component)]
+pub struct Flower;
+
 
 fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
     // commands.spawn(Camera2dBundle::default());
@@ -46,7 +51,7 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
         ..default()
     };
 
-
+    // Queen Bee
     commands.spawn((
         SpriteBundle {
             texture: textures.queen.clone(),
@@ -58,6 +63,19 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
         LockedAxes::ROTATION_LOCKED,
         Production(1.0),
         QueenBee,
+    ));
+
+    // Flower
+    commands.spawn((
+        SpriteBundle {
+            texture: textures.flower.clone(),
+            transform: Transform::from_translation(Vec3::new(350., 5., 1.)),
+            ..Default::default()
+        },
+        RigidBody::Kinematic,
+        Collider::ball(20.0 as Scalar),
+        AngularVelocity(1.5),
+        Flower,
     ));
 
     // Ceiling
@@ -143,53 +161,41 @@ fn worker_bee_movement(
     }
 }
 
-// pub fn death_collisions(
-//     // mut commands: Commands,
-//     mut actions: ResMut<Actions>,
-//     mut collision_event_reader: EventReader<CollisionStarted>,
-//     queen_query: Query<Entity, With<QueenBee>>,
-//     // mut time: ResMut<Time<Physics>>,
-// ) {
+pub fn flower_collision(
+    mut score: ResMut<Score>,
+    mut collision_event_reader: EventReader<CollisionStarted>,
+    mut queen_query: Query<(&mut Production, Entity), With<QueenBee>>,
+    mut flower_query: Query<(&mut Transform, Entity), With<Flower>>,
+    time: Res<Time>,
+) {
     
-//     // actions.p1_queen_died = false; // maybe set this to false on game/round restart
-//     // actions.p2_queen_died = false; // maybe set this to false on game/round restart
-//     actions.worker_bee_died = false;
+    for CollisionStarted(entity1, entity2) in collision_event_reader.read() {
 
-//     for CollisionStarted(entity1, entity2) in collision_event_reader.read() {
-
-//         let mut queen_just_died: bool = false;
+        let mut flower_gotten: bool = false;
         
-//         if let Ok(_) = p1_queen_query.get(*entity1) {
-//             actions.p1_queen_died = true;
-//             queen_just_died = true;
-//             println!("Player 2 Wins!!!");
-//             // time.pause();
-//         } else if let Ok(_) = p1_queen_query.get(*entity2) {
-//             actions.p1_queen_died = true;
-//             queen_just_died = true;
-//             println!("Player 2 Wins!!!");
-//             // time.pause();
-//         }
-        
-//         if let Ok(_) = p2_queen_query.get(*entity1) {
-//             actions.p2_queen_died = true;
-//             queen_just_died = true;
-//             println!("Player 1 Wins!!!");
-//             // time.pause();
-//         } else if let Ok(_) = p2_queen_query.get(*entity2) {
-//             actions.p2_queen_died = true;
-//             queen_just_died = true;
-//             println!("Player 1 Wins!!!");
-//             // time.pause();
-//         }
+        if let Ok(_) = queen_query.get(*entity1) {
+            if let Ok(_) = flower_query.get(*entity2) {
+                flower_gotten = true;
+            }
+        } else if let Ok(_) = queen_query.get(*entity2) {
+            if let Ok(_) = flower_query.get(*entity1) {
+                flower_gotten = true;
+            }
+        }
 
-//         if !queen_just_died {
-//             // worker bees dying
-//             // commands.entity(*entity1).despawn();
-//             // commands.entity(*entity2).despawn();
-//             actions.worker_bee_died = true;
-//         }
+        if flower_gotten {
+            score.points = score.points + 1.0;
+            for (mut transform, _)  in &mut flower_query {
+                let randomish = 10000.0 * time.elapsed_seconds();
+                transform.translation.x = randomish % 400.0 * (-(randomish % 2.0) * 2.0 + 1.0).clamp(-1.0, 1.0);
+                transform.translation.y = randomish % 210.0 * (-(randomish % 3.0) * 2.0 + 3.0).clamp(-1.0, 1.0);
+            }
+            for (mut production, _) in &mut queen_query {
+                production.0 += 1.0;
+            }
+            break;
+        }
 
-//     }
-// }
+    }
+}
 

@@ -6,6 +6,7 @@ mod loading;
 mod menu;
 mod bees;
 mod bee_spawner;
+mod scoreboard;
 mod fps_counter;
 
 use crate::actions::ActionsPlugin;
@@ -13,6 +14,7 @@ use crate::audio::InternalAudioPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::bees::BeesPlugin;
+use crate::scoreboard::ScoreboardPlugin;
 use crate::fps_counter::FPSCounterPlugin;
 
 use bevy::app::App;
@@ -44,7 +46,8 @@ impl Plugin for GamePlugin {
             ActionsPlugin,
             InternalAudioPlugin,
             BeesPlugin,
-            FPSCounterPlugin,
+            ScoreboardPlugin,
+            // FPSCounterPlugin,
         ));
 
         #[cfg(debug_assertions)]
