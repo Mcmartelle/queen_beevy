@@ -175,6 +175,7 @@ fn worker_bee_movement(
 }
 
 pub fn flower_collision(
+    mut actions: ResMut<Actions>,
     mut score: ResMut<Score>,
     mut collision_event_reader: EventReader<CollisionStarted>,
     mut queen_query: Query<(&mut Production, Entity), With<QueenBee>>,
@@ -196,6 +197,7 @@ pub fn flower_collision(
 
         if flower_gotten {
             score.points = score.points + 1.0;
+            actions.flower_gotten = true;
             for (mut transform, _) in &mut flower_query {
                 let randomish = 10000.0 * time.elapsed_seconds();
                 transform.translation.x =

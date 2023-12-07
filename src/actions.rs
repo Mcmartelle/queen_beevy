@@ -23,10 +23,7 @@ impl Plugin for ActionsPlugin {
 pub struct Actions {
     pub p1_movement: Vec2,
     pub p1_bee_movement: Vec2,
-    pub p2_movement: Vec2,
-    pub p1_queen_died: bool,
-    pub p2_queen_died: bool,
-    pub worker_bee_died: bool,
+    pub flower_gotten: bool,
 }
 
 pub fn gamepad_system(

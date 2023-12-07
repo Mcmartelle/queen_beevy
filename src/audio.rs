@@ -2,7 +2,7 @@ use crate::actions::{
     // set_movement_actions,
     Actions,
 };
-// use crate::bees::death_collisions;
+use crate::bees::flower_collision;
 use crate::loading::AudioAssets;
 use crate::GameState;
 use bevy::prelude::*;
@@ -17,18 +17,13 @@ impl Plugin for InternalAudioPlugin {
         app: &mut App,
     ) {
         app.add_plugins(AudioPlugin)
-            .add_systems(OnEnter(GameState::Playing), start_audio);
-        // .add_systems(
-        //     Update,
-        //     // (
-        //         // control_flying_sound
-        //     //     .after(set_movement_actions)
-        //     //     .run_if(in_state(GameState::Playing)),
-        //     // play_death_sound
-        //     //     .after(death_collisions)
-        //     //     .run_if(in_state(GameState::Playing)
-        //     // ),
-        // );
+            .add_systems(OnEnter(GameState::Playing), start_audio)
+            .add_systems(
+                Update,
+                play_flower_sound
+                    .after(flower_collision)
+                    .run_if(in_state(GameState::Playing)),
+            );
     }
 }
 
@@ -36,7 +31,7 @@ impl Plugin for InternalAudioPlugin {
 struct FlyingAudio(Handle<AudioInstance>);
 
 #[derive(Resource)]
-struct DeathAudio(Handle<AudioInstance>);
+struct FlowerAudio(Handle<AudioInstance>);
 
 fn start_audio(
     mut commands: Commands,
@@ -45,41 +40,44 @@ fn start_audio(
 ) {
     audio.pause();
     let handle = audio
-        .play(audio_assets.flying.clone())
-        .looped()
-        .with_volume(0.3)
+        .play(audio_assets.flower.clone())
+        .with_volume(0.5)
         .handle();
-    commands.insert_resource(FlyingAudio(handle));
+    audio.stop();
+    commands.insert_resource(FlowerAudio(handle));
 }
 
-fn play_death_sound(
-    actions: Res<Actions>,
-    audio_assets: Res<AudioAssets>,
+fn play_flower_sound(
+    mut commands: Commands,
+    mut actions: ResMut<Actions>,
+    flower_audio: Res<FlowerAudio>,
     audio: Res<Audio>,
+    audio_assets: Res<AudioAssets>,
+    mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
-    if actions.worker_bee_died {
-        audio.play(audio_assets.death.clone()).with_volume(0.3);
+    if let Some(instance) = audio_instances.get_mut(&flower_audio.0) {
+        match instance.state() {
+            PlaybackState::Paused { .. } => {
+                instance.resume(AudioTween::default());
+            }
+            PlaybackState::Playing { .. } | PlaybackState::Stopping { .. } => {
+                if actions.flower_gotten {
+                    actions.flower_gotten = false;
+                    instance.seek_to(0.0);
+                    // instance.pause(AudioTween::default());
+                }
+            }
+            PlaybackState::Stopped => {
+                if actions.flower_gotten {
+                    actions.flower_gotten = false;
+                    let handle = audio
+                        .play(audio_assets.flower.clone())
+                        .with_volume(0.5)
+                        .handle();
+                    commands.insert_resource(FlowerAudio(handle));
+                }
+            }
+            _ => {}
+        }
     }
 }
-
-// fn control_flying_sound(
-//     actions: Res<Actions>,
-//     audio: Res<FlyingAudio>,
-//     mut audio_instances: ResMut<Assets<AudioInstance>>,
-// ) {
-//     if let Some(instance) = audio_instances.get_mut(&audio.0) {
-//         match instance.state() {
-//             PlaybackState::Paused { .. } => {
-//                 if actions.p1_movement != Vec2::ZERO {
-//                     instance.resume(AudioTween::default());
-//                 }
-//             }
-//             PlaybackState::Playing { .. } => {
-//                 if actions.p1_movement == Vec2::ZERO {
-//                     instance.pause(AudioTween::default());
-//                 }
-//             }
-//             _ => {}
-//         }
-//     }
-// }
