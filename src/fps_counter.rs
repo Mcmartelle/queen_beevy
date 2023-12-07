@@ -1,16 +1,18 @@
+use crate::GameState;
 use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
 };
-use crate::GameState;
 
 #[derive(Default)]
 pub struct FPSCounterPlugin;
 
 impl Plugin for FPSCounterPlugin {
-    fn build(&self, app: &mut App) {
-        app
-            .add_systems(OnEnter(GameState::Playing), setup)
+    fn build(
+        &self,
+        app: &mut App,
+    ) {
+        app.add_systems(OnEnter(GameState::Playing), setup)
             .add_systems(Update, update_fps_text.run_if(in_state(GameState::Playing)));
     }
 }
@@ -38,7 +40,10 @@ fn setup(mut commands: Commands) {
     ));
 }
 
-fn update_fps_text(diagnostics: Res<DiagnosticsStore>, mut query: Query<&mut Text, With<FpsText>>) {
+fn update_fps_text(
+    diagnostics: Res<DiagnosticsStore>,
+    mut query: Query<&mut Text, With<FpsText>>,
+) {
     for mut text in &mut query {
         if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
             if let Some(value) = fps.smoothed() {

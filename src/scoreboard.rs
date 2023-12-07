@@ -1,14 +1,20 @@
-use bevy::prelude::*;
 use crate::GameState;
+use bevy::prelude::*;
 
 #[derive(Default)]
 pub struct ScoreboardPlugin;
 
 impl Plugin for ScoreboardPlugin {
-    fn build(&self, app: &mut App) {
+    fn build(
+        &self,
+        app: &mut App,
+    ) {
         app.init_resource::<Score>()
             .add_systems(OnEnter(GameState::Playing), setup)
-            .add_systems(Update, update_score_text.run_if(in_state(GameState::Playing)));
+            .add_systems(
+                Update,
+                update_score_text.run_if(in_state(GameState::Playing)),
+            );
     }
 }
 
@@ -16,7 +22,7 @@ impl Plugin for ScoreboardPlugin {
 struct ScoreText;
 
 #[derive(Default, Resource)]
-pub struct Score{ 
+pub struct Score {
     pub points: f32,
 }
 
@@ -40,9 +46,12 @@ fn setup(mut commands: Commands) {
     ));
 }
 
-fn update_score_text(score: Res<Score>, mut query: Query<&mut Text, With<ScoreText>>) {
+fn update_score_text(
+    score: Res<Score>,
+    mut query: Query<&mut Text, With<ScoreText>>,
+) {
     let points = score.points;
     for mut text in &mut query {
-        text.sections[0].value = format!("Score: {points:.0}");    
+        text.sections[0].value = format!("Score: {points:.0}");
     }
 }

@@ -1,28 +1,41 @@
 #![allow(clippy::unnecessary_cast)]
 
+use crate::actions::{gamepad_system, Actions};
 use crate::bee_spawner::BeeSpawnerPlugin;
 use crate::loading::TextureAssets;
-use crate::GameState;
-use crate::actions::{Actions, gamepad_system};
 use crate::scoreboard::Score;
+use crate::GameState;
 use bevy::prelude::*;
 use bevy_xpbd_2d::{math::*, prelude::*};
 
 pub struct BeesPlugin;
 
 impl Plugin for BeesPlugin {
-    fn build(&self, app: &mut App) {
+    fn build(
+        &self,
+        app: &mut App,
+    ) {
         app.add_plugins(BeeSpawnerPlugin)
             .add_plugins(PhysicsPlugins::default())
             .insert_resource(ClearColor(Color::rgb(0.161, 0.678, 1.0)))
             .insert_resource(SubstepCount(6))
             .insert_resource(Gravity(Vector::ZERO))
             .add_systems(OnEnter(GameState::Playing), setup)
-            .add_systems(Update, (
-                queen_bee_movement.after(gamepad_system).run_if(in_state(GameState::Playing)),
-                worker_bee_movement.after(gamepad_system).run_if(in_state(GameState::Playing)),
-            ))
-            .add_systems(PostProcessCollisions, flower_collision.run_if(in_state(GameState::Playing)));
+            .add_systems(
+                Update,
+                (
+                    queen_bee_movement
+                        .after(gamepad_system)
+                        .run_if(in_state(GameState::Playing)),
+                    worker_bee_movement
+                        .after(gamepad_system)
+                        .run_if(in_state(GameState::Playing)),
+                ),
+            )
+            .add_systems(
+                PostProcessCollisions,
+                flower_collision.run_if(in_state(GameState::Playing)),
+            );
     }
 }
 
@@ -41,8 +54,10 @@ pub struct Wall;
 #[derive(Component)]
 pub struct Flower;
 
-
-fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
+fn setup(
+    mut commands: Commands,
+    textures: Res<TextureAssets>,
+) {
     // commands.spawn(Camera2dBundle::default());
 
     let square_sprite = Sprite {
@@ -122,9 +137,7 @@ fn setup(mut commands: Commands, textures: Res<TextureAssets>) {
         RigidBody::Static,
         Collider::cuboid(50.0, 50.0),
     ));
-    
 }
-
 
 const QUEEN_MOVEMENT_SCALING_X: f32 = 700.0;
 const QUEEN_MOVEMENT_SCALING_Y: f32 = 700.0;
@@ -168,11 +181,9 @@ pub fn flower_collision(
     mut flower_query: Query<(&mut Transform, Entity), With<Flower>>,
     time: Res<Time>,
 ) {
-    
     for CollisionStarted(entity1, entity2) in collision_event_reader.read() {
-
         let mut flower_gotten: bool = false;
-        
+
         if let Ok(_) = queen_query.get(*entity1) {
             if let Ok(_) = flower_query.get(*entity2) {
                 flower_gotten = true;
@@ -185,17 +196,17 @@ pub fn flower_collision(
 
         if flower_gotten {
             score.points = score.points + 1.0;
-            for (mut transform, _)  in &mut flower_query {
+            for (mut transform, _) in &mut flower_query {
                 let randomish = 10000.0 * time.elapsed_seconds();
-                transform.translation.x = randomish % 400.0 * (-(randomish % 2.0) * 2.0 + 1.0).clamp(-1.0, 1.0);
-                transform.translation.y = randomish % 210.0 * (-(randomish % 3.0) * 2.0 + 3.0).clamp(-1.0, 1.0);
+                transform.translation.x =
+                    randomish % 400.0 * (-(randomish % 2.0) * 2.0 + 1.0).clamp(-1.0, 1.0);
+                transform.translation.y =
+                    randomish % 210.0 * (-(randomish % 3.0) * 2.0 + 3.0).clamp(-1.0, 1.0);
             }
             for (mut production, _) in &mut queen_query {
                 production.0 += 1.0;
             }
             break;
         }
-
     }
 }
-

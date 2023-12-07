@@ -2,20 +2,20 @@
 
 mod actions;
 mod audio;
+mod bee_spawner;
+mod bees;
+mod fps_counter;
 mod loading;
 mod menu;
-mod bees;
-mod bee_spawner;
 mod scoreboard;
-mod fps_counter;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
+use crate::bees::BeesPlugin;
+use crate::fps_counter::FPSCounterPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
-use crate::bees::BeesPlugin;
 use crate::scoreboard::ScoreboardPlugin;
-use crate::fps_counter::FPSCounterPlugin;
 
 use bevy::app::App;
 #[cfg(debug_assertions)]
@@ -39,7 +39,10 @@ enum GameState {
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
-    fn build(&self, app: &mut App) {
+    fn build(
+        &self,
+        app: &mut App,
+    ) {
         app.add_state::<GameState>().add_plugins((
             LoadingPlugin,
             MenuPlugin,

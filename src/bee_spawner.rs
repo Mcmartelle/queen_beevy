@@ -1,15 +1,21 @@
 use bevy::prelude::*;
 
-use crate::GameState;
 use crate::bees::{Production, QueenBee, WorkerBee};
 use crate::loading::TextureAssets;
+use crate::GameState;
 use bevy_xpbd_2d::{math::*, prelude::*};
 
 pub struct BeeSpawnerPlugin;
 
 impl Plugin for BeeSpawnerPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Update, spawn_worker_bee.run_if(in_state(GameState::Playing)));    
+    fn build(
+        &self,
+        app: &mut App,
+    ) {
+        app.add_systems(
+            Update,
+            spawn_worker_bee.run_if(in_state(GameState::Playing)),
+        );
     }
 }
 
@@ -20,7 +26,6 @@ fn spawn_worker_bee(
     queen_query: Query<(&Transform, &Production), With<QueenBee>>,
     textures: Res<TextureAssets>,
 ) {
-
     for (transform, production) in &queen_query {
         if (time.elapsed_seconds() - *time_produced) > (1.0 / production.0) {
             *time_produced = time.elapsed_seconds();
@@ -35,6 +40,5 @@ fn spawn_worker_bee(
                 WorkerBee,
             ));
         }
-    } 
-
+    }
 }

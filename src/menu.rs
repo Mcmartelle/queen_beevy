@@ -7,7 +7,10 @@ pub struct MenuPlugin;
 /// This plugin is responsible for the game menu (containing only one button...)
 /// The menu is only drawn during the State `GameState::Menu` and is removed when that state is exited
 impl Plugin for MenuPlugin {
-    fn build(&self, app: &mut App) {
+    fn build(
+        &self,
+        app: &mut App,
+    ) {
         app.add_systems(OnEnter(GameState::Menu), setup_menu)
             .add_systems(Update, click_play_button.run_if(in_state(GameState::Menu)))
             .add_systems(OnExit(GameState::Menu), cleanup_menu);
@@ -32,7 +35,10 @@ impl Default for ButtonColors {
 #[derive(Component)]
 struct Menu;
 
-fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
+fn setup_menu(
+    mut commands: Commands,
+    textures: Res<TextureAssets>,
+) {
     info!("menu");
     commands.spawn(Camera2dBundle::default());
     commands
@@ -215,7 +221,10 @@ fn click_play_button(
     }
 }
 
-fn cleanup_menu(mut commands: Commands, menu: Query<Entity, With<Menu>>) {
+fn cleanup_menu(
+    mut commands: Commands,
+    menu: Query<Entity, With<Menu>>,
+) {
     for entity in menu.iter() {
         commands.entity(entity).despawn_recursive();
     }

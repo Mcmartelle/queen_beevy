@@ -1,25 +1,20 @@
-use bevy::{
-    input::gamepad::{
-        GamepadButton,
-    },
-    prelude::*,
-};
+use bevy::{input::gamepad::GamepadButton, prelude::*};
 
 // use crate::player::Player;
 use crate::GameState;
-
 
 pub struct ActionsPlugin;
 
 // This plugin listens for keyboard input and converts the input into Actions
 // Actions can then be used as a resource in other systems to act on the player input.
 impl Plugin for ActionsPlugin {
-    fn build(&self, app: &mut App) {
+    fn build(
+        &self,
+        app: &mut App,
+    ) {
         app.init_resource::<Actions>().add_systems(
             Update,
-            (
-                gamepad_system.run_if(in_state(GameState::Playing)),
-            ),
+            (gamepad_system.run_if(in_state(GameState::Playing)),),
         );
     }
 }
@@ -66,8 +61,8 @@ pub fn gamepad_system(
             info!("{:?} LeftStickX value is {}", gamepad, left_stick_x);
         }
         let left_stick_y = axes
-        .get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickY))
-        .unwrap();
+            .get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickY))
+            .unwrap();
         if left_stick_y.abs() > 0.01 {
             info!("{:?} LeftStickX value is {}", gamepad, left_stick_y);
         }
@@ -79,8 +74,8 @@ pub fn gamepad_system(
             info!("{:?} RightStickX value is {}", gamepad, right_stick_x);
         }
         let right_stick_y = axes
-        .get(GamepadAxis::new(gamepad, GamepadAxisType::RightStickY))
-        .unwrap();
+            .get(GamepadAxis::new(gamepad, GamepadAxisType::RightStickY))
+            .unwrap();
         if right_stick_y.abs() > 0.01 {
             info!("{:?} RightStickX value is {}", gamepad, right_stick_y);
         }
