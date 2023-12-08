@@ -1,3 +1,4 @@
+use crate::actions::{Actions, InputDevice};
 use crate::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
@@ -27,7 +28,7 @@ impl Default for ButtonColors {
     fn default() -> Self {
         ButtonColors {
             normal: Color::rgb(0.15, 0.15, 0.15),
-            hovered: Color::rgb(0.25, 0.25, 0.25),
+            hovered: Color::rgb(0.3, 0.3, 0.3),
         }
     }
 }
@@ -49,7 +50,7 @@ fn setup_menu(
                     height: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
                     align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
+                    justify_content: JustifyContent::SpaceEvenly,
                     ..default()
                 },
                 ..default()
@@ -62,7 +63,7 @@ fn setup_menu(
                 .spawn((
                     ButtonBundle {
                         style: Style {
-                            width: Val::Px(140.0),
+                            width: Val::Px(400.0),
                             height: Val::Px(50.0),
                             justify_content: JustifyContent::Center,
                             align_items: AlignItems::Center,
@@ -73,12 +74,41 @@ fn setup_menu(
                     },
                     button_colors,
                     ChangeState(GameState::Playing),
+                    ChangeInput(InputDevice::Gamepad),
                 ))
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
-                        "Play",
+                        "Play with Controller",
                         TextStyle {
-                            font_size: 40.0,
+                            font_size: 32.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                            ..default()
+                        },
+                    ));
+                });
+            let button_colors = ButtonColors::default();
+            children
+                .spawn((
+                    ButtonBundle {
+                        style: Style {
+                            width: Val::Px(400.0),
+                            height: Val::Px(50.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..Default::default()
+                        },
+                        background_color: button_colors.normal.into(),
+                        ..Default::default()
+                    },
+                    button_colors,
+                    ChangeState(GameState::Playing),
+                    ChangeInput(InputDevice::Keyboard),
+                ))
+                .with_children(|parent| {
+                    parent.spawn(TextBundle::from_section(
+                        "Play with Keyboard",
+                        TextStyle {
+                            font_size: 32.0,
                             color: Color::rgb(0.9, 0.9, 0.9),
                             ..default()
                         },
@@ -185,6 +215,9 @@ fn setup_menu(
 struct ChangeState(GameState);
 
 #[derive(Component)]
+struct ChangeInput(InputDevice);
+
+#[derive(Component)]
 struct OpenLink(&'static str);
 
 fn click_play_button(
@@ -196,14 +229,24 @@ fn click_play_button(
             &ButtonColors,
             Option<&ChangeState>,
             Option<&OpenLink>,
+            Option<&ChangeInput>,
         ),
         (Changed<Interaction>, With<Button>),
     >,
+    mut actions: ResMut<Actions>,
 ) {
-    for (interaction, mut color, button_colors, change_state, open_link) in &mut interaction_query {
+    for (interaction, mut color, button_colors, change_state, open_link, change_input) in
+        &mut interaction_query
+    {
         match *interaction {
             Interaction::Pressed => {
                 if let Some(state) = change_state {
+                    if let Some(device) = change_input {
+                        match device.0 {
+                            InputDevice::Gamepad => actions.input_device = InputDevice::Gamepad,
+                            InputDevice::Keyboard => actions.input_device = InputDevice::Keyboard,
+                        }
+                    }
                     next_state.set(state.0.clone());
                 } else if let Some(link) = open_link {
                     if let Err(error) = webbrowser::open(link.0) {

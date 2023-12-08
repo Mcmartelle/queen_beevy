@@ -24,6 +24,18 @@ pub struct Actions {
     pub p1_movement: Vec2,
     pub p1_bee_movement: Vec2,
     pub flower_gotten: bool,
+    pub input_device: InputDevice,
+}
+
+pub enum InputDevice {
+    Gamepad,
+    Keyboard,
+}
+
+impl Default for InputDevice {
+    fn default() -> Self {
+        InputDevice::Gamepad
+    }
 }
 
 pub fn gamepad_system(
