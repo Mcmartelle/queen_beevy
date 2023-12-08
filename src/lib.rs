@@ -12,7 +12,6 @@ mod scoreboard;
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
 use crate::bees::BeesPlugin;
-use crate::fps_counter::FPSCounterPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::scoreboard::ScoreboardPlugin;

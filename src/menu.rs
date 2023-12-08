@@ -58,40 +58,44 @@ fn setup_menu(
             Menu,
         ))
         .with_children(|children| {
-            children.spawn(TextBundle::from_section(
-                "Objective: Get Flowers with the Queen Bee",
-                TextStyle {
-                    font: default(),
-                    font_size: 30.0,
-                    color: Color::WHITE,
-                },
-                
-            ).with_style(Style {
-                margin: UiRect {
-                    left: Val::Px(10.0),
-                    right: Val::Px(10.0),
-                    top: Val::Px(10.0),
-                    bottom: Val::Px(5.0),
-                },
-                ..default()
-            }),);
-            children.spawn(TextBundle::from_section(
-                "WARNING: Flowers increase spawn rate of worker bees!",
-                TextStyle {
-                    font: default(),
-                    font_size: 22.0,
-                    color: Color::rgb(0.7, 0.0, 0.0),
-                },
-                
-            ).with_style(Style {
-                margin: UiRect {
-                    left: Val::Px(5.0),
-                    right: Val::Px(10.0),
-                    top: Val::Px(10.0),
-                    bottom: Val::Px(50.0),
-                },
-                ..default()
-            }),);
+            children.spawn(
+                TextBundle::from_section(
+                    "Objective: Get Flowers with the Queen Bee",
+                    TextStyle {
+                        font: default(),
+                        font_size: 30.0,
+                        color: Color::WHITE,
+                    },
+                )
+                .with_style(Style {
+                    margin: UiRect {
+                        left: Val::Px(10.0),
+                        right: Val::Px(10.0),
+                        top: Val::Px(10.0),
+                        bottom: Val::Px(5.0),
+                    },
+                    ..default()
+                }),
+            );
+            children.spawn(
+                TextBundle::from_section(
+                    "WARNING: Flowers increase spawn rate of worker bees!",
+                    TextStyle {
+                        font: default(),
+                        font_size: 22.0,
+                        color: Color::rgb(0.7, 0.0, 0.0),
+                    },
+                )
+                .with_style(Style {
+                    margin: UiRect {
+                        left: Val::Px(5.0),
+                        right: Val::Px(10.0),
+                        top: Val::Px(10.0),
+                        bottom: Val::Px(50.0),
+                    },
+                    ..default()
+                }),
+            );
             let button_colors = ButtonColors::default();
             children
                 .spawn((
@@ -120,22 +124,25 @@ fn setup_menu(
                         },
                     ));
                 });
-            children.spawn(TextBundle::from_section(
-                "Left Stick: Queen Bee, Right Stick: Worker Bees",
-                TextStyle {
-                    font: default(),
-                    font_size: 20.0,
-                    color: Color::WHITE,
-                },
-            ).with_style(Style {
-                margin: UiRect {
-                    left: Val::Px(10.0),
-                    right: Val::Px(10.0),
-                    top: Val::Px(10.0),
-                    bottom: Val::Px(30.0),
-                },
-                ..default()
-            }),);
+            children.spawn(
+                TextBundle::from_section(
+                    "Left Stick: Queen Bee, Right Stick: Worker Bees",
+                    TextStyle {
+                        font: default(),
+                        font_size: 20.0,
+                        color: Color::WHITE,
+                    },
+                )
+                .with_style(Style {
+                    margin: UiRect {
+                        left: Val::Px(10.0),
+                        right: Val::Px(10.0),
+                        top: Val::Px(10.0),
+                        bottom: Val::Px(30.0),
+                    },
+                    ..default()
+                }),
+            );
             let button_colors = ButtonColors::default();
             children
                 .spawn((
@@ -164,22 +171,25 @@ fn setup_menu(
                         },
                     ));
                 });
-            children.spawn(TextBundle::from_section(
-                "WASD: Queen Bee, Arrow Keys: Worker Bees",
-                TextStyle {
-                    font: default(),
-                    font_size: 20.0,
-                    color: Color::WHITE,
-                },
-            ).with_style(Style {
-                margin: UiRect {
-                    left: Val::Px(10.0),
-                    right: Val::Px(10.0),
-                    top: Val::Px(10.0),
-                    bottom: Val::Px(30.0),
-                },
-                ..default()
-            }),);
+            children.spawn(
+                TextBundle::from_section(
+                    "WASD: Queen Bee, Arrow Keys: Worker Bees",
+                    TextStyle {
+                        font: default(),
+                        font_size: 20.0,
+                        color: Color::WHITE,
+                    },
+                )
+                .with_style(Style {
+                    margin: UiRect {
+                        left: Val::Px(10.0),
+                        right: Val::Px(10.0),
+                        top: Val::Px(10.0),
+                        bottom: Val::Px(30.0),
+                    },
+                    ..default()
+                }),
+            );
         });
     commands
         .spawn((
