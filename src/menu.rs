@@ -254,7 +254,7 @@ fn setup_menu(
                         normal: Color::NONE,
                         hovered: Color::rgb(0.25, 0.25, 0.25),
                     },
-                    OpenLink("https://github.com/NiklasEi/bevy_game_template"),
+                    OpenLink("https://github.com/Mcmartelle/queen_beevy"),
                 ))
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
