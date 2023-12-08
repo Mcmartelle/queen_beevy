@@ -108,7 +108,7 @@ fn setup(
     commands.spawn((
         SpriteBundle {
             sprite: square_sprite.clone(),
-            transform: Transform::from_xyz(0.0, -50.0 * 6.0, 0.0)
+            transform: Transform::from_xyz(0.0, -53.0 * 6.0, 0.0)
                 .with_scale(Vec3::new(20.0, 1.0, 1.0)),
             ..default()
         },
@@ -119,8 +119,8 @@ fn setup(
     commands.spawn((
         SpriteBundle {
             sprite: square_sprite.clone(),
-            transform: Transform::from_xyz(-50.0 * 9.5, 0.0, 0.0)
-                .with_scale(Vec3::new(1.0, 11.0, 1.0)),
+            transform: Transform::from_xyz(-44.0 * 9.5, 0.0, 0.0)
+                .with_scale(Vec3::new(1.0, 12.0, 1.0)),
             ..default()
         },
         RigidBody::Static,
@@ -130,8 +130,8 @@ fn setup(
     commands.spawn((
         SpriteBundle {
             sprite: square_sprite,
-            transform: Transform::from_xyz(50.0 * 9.5, 0.0, 0.0)
-                .with_scale(Vec3::new(1.0, 11.0, 1.0)),
+            transform: Transform::from_xyz(44.0 * 9.5, 0.0, 0.0)
+                .with_scale(Vec3::new(1.0, 12.0, 1.0)),
             ..default()
         },
         RigidBody::Static,
@@ -202,7 +202,7 @@ pub fn flower_collision(
             for (mut transform, _) in &mut flower_query {
                 let randomish = 10000.0 * time.elapsed_seconds();
                 transform.translation.x =
-                    randomish % 400.0 * (-(randomish % 2.0) * 2.0 + 1.0).clamp(-1.0, 1.0);
+                    randomish % 370.0 * (-(randomish % 2.0) * 2.0 + 1.0).clamp(-1.0, 1.0);
                 transform.translation.y =
                     randomish % 210.0 * (-(randomish % 3.0) * 2.0 + 3.0).clamp(-1.0, 1.0);
             }

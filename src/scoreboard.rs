@@ -42,8 +42,8 @@ fn setup(mut commands: Commands) {
         )
         .with_style(Style {
             position_type: PositionType::Absolute,
-            top: Val::Px(5.0),
-            left: Val::Px(5.0),
+            top: Val::Px(3.0),
+            left: Val::Px(8.0),
             ..default()
         }),
         ScoreText,
@@ -59,8 +59,8 @@ fn setup(mut commands: Commands) {
         )
         .with_style(Style {
             position_type: PositionType::Absolute,
-            top: Val::Px(5.0),
-            right: Val::Px(5.0),
+            top: Val::Px(3.0),
+            right: Val::Px(8.0),
             ..default()
         }),
         BeeText,
